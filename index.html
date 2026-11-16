@@ -141,13 +141,21 @@ const siEs = v => /^(true|verdadero|sí|si|x|1)$/i.test(String(v).trim());
 const plata = n => "$" + Number(String(n).replace(/[^\d]/g,"")||0).toLocaleString("es-CO");
 const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
+// Acepta el enlace normal de Google Drive (como lo copia el dueño) y lo convierte en imagen
+function fotoUrl(v){
+  v = String(v||"").trim();
+  if(!v) return "";
+  const m = v.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:.*&)?id=)([\w-]{20,})/);
+  return m ? "https://lh3.googleusercontent.com/d/" + m[1] + "=w800" : v;
+}
+
 function normalizar(filas){
   return filas.map(r=>({
     categoria: r["categoría"]||r["categoria"]||"Otros",
     plato: r["plato"]||"",
     descripcion: r["descripción"]||r["descripcion"]||"",
     precio: r["precio"]||"",
-    foto: r["foto"]||"",
+    foto: fotoUrl(r["foto"]),
     disponible: siEs(r["disponible"]),
     destacado: siEs(r["destacado"])
   })).filter(p=>p.plato);
