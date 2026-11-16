@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menú digital (demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf6f0; --card:#ffffff; --ink:#2b2118; --muted:#7a6a5c;
+    --accent:#b5562b; --accent-soft:#f3e2d6; --line:#ece3d8; --ok:#2f7d4f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  header{padding:36px 20px 20px;text-align:center}
+  header .tag{display:inline-block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px}
+  header h1{font-family:Fraunces,serif;font-size:clamp(30px,7vw,44px);line-height:1.1}
+  header p{color:var(--muted);margin-top:8px;font-size:15px}
+  .aviso{max-width:720px;margin:0 auto 8px;padding:10px 14px;border-radius:10px;background:var(--accent-soft);font-size:13px;color:#6b3a20;text-align:center}
+  nav{position:sticky;top:0;z-index:5;background:rgba(250,246,240,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  nav .chips{display:flex;gap:8px;overflow-x:auto;padding:12px 20px;max-width:760px;margin:0 auto;scrollbar-width:none}
+  nav .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:999px;font:500 14px Inter,sans-serif;color:var(--ink);cursor:pointer}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  main{max-width:760px;margin:0 auto;padding:8px 20px 120px}
+  section{padding-top:22px;scroll-margin-top:64px}
+  section h2{font-family:Fraunces,serif;font-size:24px;margin-bottom:12px}
+  .item{display:flex;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;align-items:center}
+  .foto{width:76px;height:76px;flex:none;border-radius:10px;background:var(--accent-soft) center/cover no-repeat;display:grid;place-items:center;font-size:30px}
+  .info{flex:1;min-width:0}
+  .fila{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+  .nombre{font-weight:600;font-size:16px}
+  .precio{font-weight:600;color:var(--accent);white-space:nowrap}
+  .desc{color:var(--muted);font-size:14px;margin-top:2px}
+  .badge{display:inline-block;margin-top:6px;font-size:11px;font-weight:600;color:var(--ok);background:#e3f1e8;padding:2px 8px;border-radius:999px}
+  .eventos{margin-top:34px;background:var(--ink);color:#fff;border-radius:18px;padding:24px}
+  .eventos h2{font-family:Fraunces,serif;font-size:24px}
+  .eventos p{color:#d9cdc2;margin:8px 0 16px;font-size:15px}
+  .btn{display:inline-block;background:#25d366;color:#0b3d1f;font-weight:600;text-decoration:none;padding:12px 18px;border-radius:12px}
+  .tel{display:block;margin-top:10px;font-size:13px;color:#d9cdc2}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:24px 20px 40px}
+  .estado{color:var(--muted);text-align:center;padding:40px 0}
+
+  /* Panel de simulación (solo modo demo) */
+  .sim-btn{position:fixed;right:16px;bottom:16px;z-index:20;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:13px 18px;font:600 14px Inter,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.18);cursor:pointer}
+  .sim{position:fixed;inset:auto 0 0 0;z-index:30;max-height:72vh;background:#fff;border-top-left-radius:18px;border-top-right-radius:18px;box-shadow:0 -10px 30px rgba(0,0,0,.18);transform:translateY(105%);transition:transform .25s ease;display:flex;flex-direction:column}
+  .sim.open{transform:none}
+  .sim-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .sim-head b{font-size:15px}
+  .sim-head small{display:block;color:var(--muted);font-size:12px;font-weight:400}
+  .sim-head button{border:0;background:var(--accent-soft);border-radius:8px;padding:8px 12px;font:600 13px Inter,sans-serif;cursor:pointer}
+  .sim-body{overflow:auto;padding:4px 8px 16px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{position:sticky;top:0;background:#f1f3f4;text-align:left;padding:8px;font-weight:600;border:1px solid #dadce0}
+  td{border:1px solid #dadce0;padding:4px 6px}
+  td input[type=number]{width:90px;font:13px Inter,sans-serif;padding:4px;border:1px solid transparent;border-radius:4px}
+  td input[type=number]:focus{border-color:#1a73e8;outline:none}
+  td.c{text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="tag" id="tag">Menú digital</span>
+  <h1 id="nombre">Café del Cable</h1>
+  <p id="eslogan">Cocina de casa y café de origen · Manizales</p>
+</header>
+<div class="aviso" id="aviso" hidden></div>
+
+<nav><div class="chips" id="chips"></div></nav>
+<main id="menu"><p class="estado">Cargando menú…</p></main>
+
+<footer id="pie">Menú actualizado automáticamente</footer>
+
+<button class="sim-btn" id="simBtn" hidden>✏️ Simular edición del dueño</button>
+<div class="sim" id="sim" aria-hidden="true">
+  <div class="sim-head">
+    <div><b>Así se ve la hoja de Google del dueño</b><small>Cambia un precio o desmarca "Disponible" y mira el menú</small></div>
+    <button id="simCerrar">Cerrar</button>
+  </div>
+  <div class="sim-body"><table id="simTabla"></table></div>
+</div>
+
+<script>
+/* ================= CONFIGURACIÓN (lo único que cambias por cliente) ================= */
+const CONFIG = {
+  nombre:   "Café del Cable",
+  eslogan:  "Cocina de casa y café de origen · Manizales",
+  // Enlace CSV de la hoja publicada: Archivo → Compartir → Publicar en la web → CSV.
+  // Si lo dejas vacío, se muestran los datos de ejemplo de abajo.
+  csvUrl:   "https://docs.google.com/spreadsheets/d/1hNKewP9RikpFtBuYtZUVSA1RWWUlDCC4KUfUMsOD2YE/gviz/tq?tqx=out:csv&sheet=Men%C3%BA",
+  whatsapp: "573000000000",   // número del negocio, sin + ni espacios
+  textoEventos: "Hola, quiero cotizar un evento (cumpleaños / cena de grado) para ___ personas el día ___.",
+  demo:     false             // true = muestra el botón para simular la edición. Ponlo en false para el cliente.
+};
+
+/* Datos de ejemplo (mismas columnas que la hoja de Google) */
+const EJEMPLO = `Categoría,Plato,Descripción,Precio,Foto,Disponible,Destacado
+Desayunos,Calentado paisa,"Arroz, fríjol, huevo frito, chorizo y arepa",18000,,TRUE,TRUE
+Desayunos,Huevos al gusto,"Pericos, revueltos o fritos, con arepa y chocolate",14000,,TRUE,FALSE
+Desayunos,Changua,"Caldo de leche con huevo, cilantro y calado",12000,,TRUE,FALSE
+Platos fuertes,Bandeja de la casa,"Carne asada, chicharrón, arroz, fríjol, maduro y aguacate",32000,,TRUE,TRUE
+Platos fuertes,Pechuga a la plancha,"Con ensalada fresca y papas criollas",27000,,TRUE,FALSE
+Platos fuertes,Salmón en salsa de maracuyá,"Con arroz de coco y vegetales",42000,,TRUE,FALSE
+Bebidas,Capuchino,Café de origen caldense,7500,,TRUE,FALSE
+Bebidas,Limonada de coco,Natural y bien fría,9000,,TRUE,TRUE
+Bebidas,Aromática de frutas,Frutas frescas de temporada,6000,,TRUE,FALSE
+Postres,Torta de chocolate,Porción con helado de vainilla,12000,,TRUE,FALSE
+Postres,Brownie con helado,Brownie tibio y salsa de arequipe,11000,,FALSE,FALSE`;
+
+const ICONOS = {"desayunos":"🍳","platos fuertes":"🍽️","bebidas":"☕","postres":"🍰"};
+
+/* ================= LÓGICA ================= */
+let platos = [];
+
+// Lector de CSV que respeta comillas y comas dentro del texto
+function leerCSV(texto){
+  const filas=[]; let fila=[], campo="", comillas=false;
+  for(let i=0;i<texto.length;i++){
+    const c=texto[i];
+    if(comillas){
+      if(c==='"'){ if(texto[i+1]==='"'){campo+='"';i++;} else comillas=false; }
+      else campo+=c;
+    } else if(c==='"') comillas=true;
+    else if(c===','){ fila.push(campo); campo=""; }
+    else if(c==='\n'||c==='\r'){
+      if(c==='\r'&&texto[i+1]==='\n') i++;
+      fila.push(campo); filas.push(fila); fila=[]; campo="";
+    } else campo+=c;
+  }
+  if(campo!==""||fila.length){ fila.push(campo); filas.push(fila); }
+  const enc = filas.shift().map(h=>h.trim().toLowerCase());
+  return filas.filter(f=>f.some(v=>v.trim()!=="")).map(f=>{
+    const o={}; enc.forEach((h,i)=>o[h]=(f[i]||"").trim()); return o;
+  });
+}
+
+const siEs = v => /^(true|verdadero|sí|si|x|1)$/i.test(String(v).trim());
+const plata = n => "$" + Number(String(n).replace(/[^\d]/g,"")||0).toLocaleString("es-CO");
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function normalizar(filas){
+  return filas.map(r=>({
+    categoria: r["categoría"]||r["categoria"]||"Otros",
+    plato: r["plato"]||"",
+    descripcion: r["descripción"]||r["descripcion"]||"",
+    precio: r["precio"]||"",
+    foto: r["foto"]||"",
+    disponible: siEs(r["disponible"]),
+    destacado: siEs(r["destacado"])
+  })).filter(p=>p.plato);
+}
+
+function pintar(){
+  const visibles = platos.filter(p=>p.disponible);
+  const cats = [...new Set(visibles.map(p=>p.categoria))];
+  const menu = document.getElementById("menu");
+  const chips = document.getElementById("chips");
+  if(!visibles.length){ menu.innerHTML='<p class="estado">El menú se está actualizando. Vuelve en unos minutos.</p>'; chips.innerHTML=""; return; }
+
+  chips.innerHTML = cats.map((c,i)=>`<button class="chip${i===0?" on":""}" data-id="cat-${i}">${esc(c)}</button>`).join("");
+  menu.innerHTML = cats.map((c,i)=>`
+    <section id="cat-${i}">
+      <h2>${esc(c)}</h2>
+      ${visibles.filter(p=>p.categoria===c).map(p=>`
+        <div class="item">
+          <div class="foto" ${p.foto?`style="background-image:url('${esc(p.foto)}')"`:""}>${p.foto?"":(ICONOS[c.toLowerCase()]||"🍴")}</div>
+          <div class="info">
+            <div class="fila"><span class="nombre">${esc(p.plato)}</span><span class="precio">${plata(p.precio)}</span></div>
+            ${p.descripcion?`<div class="desc">${esc(p.descripcion)}</div>`:""}
+            ${p.destacado?`<span class="badge">★ Recomendado</span>`:""}
+          </div>
+        </div>`).join("")}
+    </section>`).join("") + `
+    <div class="eventos">
+      <h2>¿Celebras algo?</h2>
+      <p>Cumpleaños, cenas de grado y reuniones. Cuéntanos la fecha y cuántas personas, y te enviamos la cotización.</p>
+      <a class="btn" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(CONFIG.textoEventos)}">Cotizar por WhatsApp</a>
+      <span class="tel">WhatsApp: +${CONFIG.whatsapp}</span>
+    </div>`;
+
+  chips.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
+    chips.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    document.getElementById(b.dataset.id).scrollIntoView({behavior:"smooth"});
+  });
+}
+
+async function cargar(){
+  document.getElementById("nombre").textContent = CONFIG.nombre;
+  document.getElementById("eslogan").textContent = CONFIG.eslogan;
+  document.title = "Menú · " + CONFIG.nombre;
+  const aviso = document.getElementById("aviso");
+  let texto = EJEMPLO;
+  if(CONFIG.csvUrl){
+    try{
+      const r = await fetch(CONFIG.csvUrl + (CONFIG.csvUrl.includes("?")?"&":"?") + "t=" + Date.now());
+      if(!r.ok) throw new Error(r.status);
+      texto = await r.text();
+    }catch(e){
+      aviso.textContent = "No se pudo leer la hoja de Google; se muestra el menú de ejemplo.";
+      aviso.hidden = false;
+    }
+  } else if(CONFIG.demo){
+    aviso.textContent = "Demo: este menú usa datos de ejemplo. En la versión real se lee de la hoja de Google del negocio.";
+    aviso.hidden = false;
+  }
+  platos = normalizar(leerCSV(texto));
+  pintar();
+  if(CONFIG.demo) armarSimulador();
+}
+
+/* ===== Simulador: imita la hoja de Google para mostrar cómo edita el dueño ===== */
+function armarSimulador(){
+  const btn=document.getElementById("simBtn"), sim=document.getElementById("sim");
+  btn.hidden=false;
+  btn.onclick=()=>{sim.classList.add("open");sim.setAttribute("aria-hidden","false");};
+  document.getElementById("simCerrar").onclick=()=>{sim.classList.remove("open");sim.setAttribute("aria-hidden","true");};
+  const t=document.getElementById("simTabla");
+  t.innerHTML = `<tr><th>Categoría</th><th>Plato</th><th>Precio</th><th>Disponible</th><th>Destacado</th></tr>` +
+    platos.map((p,i)=>`<tr>
+      <td>${esc(p.categoria)}</td><td>${esc(p.plato)}</td>
+      <td><input type="number" step="500" value="${Number(String(p.precio).replace(/[^\d]/g,""))}" data-i="${i}" data-k="precio"></td>
+      <td class="c"><input type="checkbox" ${p.disponible?"checked":""} data-i="${i}" data-k="disponible"></td>
+      <td class="c"><input type="checkbox" ${p.destacado?"checked":""} data-i="${i}" data-k="destacado"></td>
+    </tr>`).join("");
+  t.querySelectorAll("input").forEach(inp=>{
+    inp.addEventListener(inp.type==="checkbox"?"change":"input",()=>{
+      const p=platos[inp.dataset.i];
+      p[inp.dataset.k] = inp.type==="checkbox" ? inp.checked : inp.value;
+      pintar();
+    });
+  });
+}
+
+cargar();
+</script>
+</body>
+</html>
